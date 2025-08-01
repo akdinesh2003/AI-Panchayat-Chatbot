@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Panchayat - గ్రామ సహాయకుడు</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Telugu', 'Noto Sans Devanagari', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .chat-bubble {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-ring {
+            animation: pulse-ring 1.5s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .recording {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            animation: recordingPulse 1s infinite alternate;
+        }
+        @keyframes recordingPulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            100% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+        
+        /* Dark mode styles */
+        .dark {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #f9fafb;
+        }
+        .dark .bg-white {
+            background-color: #374151 !important;
+            color: #f9fafb;
+        }
+        .dark .text-gray-800 {
+            color: #f9fafb !important;
+        }
+        .dark .text-gray-600 {
+            color: #d1d5db !important;
+        }
+        .dark .text-gray-700 {
+            color: #e5e7eb !important;
+        }
+        .dark .bg-gray-50 {
+            background-color: #4b5563 !important;
+        }
+        .dark .bg-gray-100 {
+            background-color: #6b7280 !important;
+        }
+        .dark .border-gray-300 {
+            border-color: #6b7280 !important;
+        }
+        .dark .bg-green-50 {
+            background-color: #065f46 !important;
+        }
+        .dark .bg-blue-50 {
+            background-color: #1e3a8a !important;
+        }
+        .dark .bg-purple-50 {
+            background-color: #581c87 !important;
+        }
+        .dark .from-green-50 {
+            --tw-gradient-from: #065f46 !important;
+        }
+        .dark .to-green-100 {
+            --tw-gradient-to: #047857 !important;
+        }
+        .dark .from-blue-50 {
+            --tw-gradient-from: #1e3a8a !important;
+        }
+        .dark .to-blue-100 {
+            --tw-gradient-to: #1d4ed8 !important;
+        }
+        .dark .from-purple-50 {
+            --tw-gradient-from: #581c87 !important;
+        }
+        .dark .to-purple-100 {
+            --tw-gradient-to: #7c3aed !important;
+        }
+        
+        .sun-icon {
+            display: block;
+        }
+        .moon-icon {
+            display: none;
+        }
+        .dark .sun-icon {
+            display: none;
+        }
+        .dark .moon-icon {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-4 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-2 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">AI Panchayat</h1>
+                    <p class="text-sm opacity-90" id="headerSubtitle">గ్రామ సహాయకుడు</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <button id="languageToggle" class="px-3 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium flex items-center space-x-1">
+                        <span id="langText">తె</span>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div id="languageDropdown" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border z-50">
+                        <button class="lang-option w-full px-4 py-2 text-left hover:bg-gray-100 rounded-t-lg text-gray-700" data-lang="te">
+                            తెలుగు (Telugu)
+                        </button>
+                        <button class="lang-option w-full px-4 py-2 text-left hover:bg-gray-100 text-gray-700" data-lang="en">
+                            English
+                        </button>
+                        <button class="lang-option w-full px-4 py-2 text-left hover:bg-gray-100 rounded-b-lg text-gray-700" data-lang="hi">
+                            हिंदी (Hindi)
+                        </button>
+                    </div>
+                </div>
+                <button id="themeToggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                    <!-- Sun Icon (Light Mode) -->
+                    <svg class="w-6 h-6 sun-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+                    </svg>
+                    <!-- Moon Icon (Dark Mode) -->
+                    <svg class="w-6 h-6 moon-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto p-4">
+        <!-- Welcome Message -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" id="welcomeTitle">స్వాగతం!</h2>
+                <p class="text-gray-600 mb-4" id="welcomeDesc">గ్రామ పంచాయతీ సేవలు మరియు ప్రభుత్వ పథకాల గురించి అడగండి</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-green-50 p-3 rounded-lg">
+                        <div class="font-semibold text-green-700" id="agriTitle">🌾 వ్యవసాయ సేవలు</div>
+                        <div class="text-green-600" id="agriDesc">పంట బీమా, రైతు భీమా</div>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <div class="font-semibold text-blue-700" id="docsTitle">📋 పత్రాలు</div>
+                        <div class="text-blue-600" id="docsDesc">రేషన్ కార్డ్, భూమి రికార్డులు</div>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg">
+                        <div class="font-semibold text-purple-700" id="contactTitle">📞 సంప్రదింపులు</div>
+                        <div class="text-purple-600" id="contactDesc">పంచాయతీ అధికారులు</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="h-96 overflow-y-auto p-4 space-y-4">
+                <div class="flex items-start space-x-3 chat-bubble">
+                    <div class="bg-green-100 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-3 max-w-xs">
+                        <p class="text-gray-800">నమస్కారం! నేను AI పంచాయత్. మీకు ఎలాంటి సహాయం కావాలి?</p>
+                        <button class="mt-2 text-green-600 hover:text-green-700 text-sm flex items-center space-x-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                            </svg>
+                            <span>వినండి</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t bg-gray-50 p-4">
+                <div class="flex items-center space-x-3">
+                    <!-- Voice Input Button -->
+                    <button id="voiceBtn" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-all duration-200 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Text Input -->
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="మీ ప్రశ్న టైప్ చేయండి..."
+                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+
+                    <!-- Send Button -->
+                    <button id="sendBtn" class="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg transition-colors flex-shrink-0">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Recording Indicator -->
+                <div id="recordingIndicator" class="hidden mt-3 flex items-center justify-center space-x-2 text-red-600">
+                    <div class="w-3 h-3 bg-red-500 rounded-full pulse-ring"></div>
+                    <span class="text-sm font-medium" id="recordingText">రికార్డింగ్ చేస్తున్నాం...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="cropInsurance">
+                <div class="text-2xl mb-2">🌾</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">పంట బీమా</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="rationCard">
+                <div class="text-2xl mb-2">📋</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">రేషన్ కార్డ్</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="landRecords">
+                <div class="text-2xl mb-2">🏠</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">భూమి రికార్డులు</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="pension">
+                <div class="text-2xl mb-2">👴</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">పెన్షన్</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="aadhaar">
+                <div class="text-2xl mb-2">🆔</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">ఆధార్ కార్డ్</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="scholarship">
+                <div class="text-2xl mb-2">🎓</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">స్కాలర్‌షిప్</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="jobCard">
+                <div class="text-2xl mb-2">💼</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">జాబ్ కార్డ్</div>
+            </button>
+            <button class="quick-action bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow text-center" data-key="electricity">
+                <div class="text-2xl mb-2">⚡</div>
+                <div class="text-sm font-medium text-gray-700 quick-text">విద్యుత్ బిల్లు</div>
+            </button>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                </svg>
+                <span id="faqTitle">తరచుగా అడిగే ప్రశ్నలు</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="faq-item text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-question="help">
+                    <div class="font-medium text-gray-800 faq-question">మీరు ఏమి చేయగలరు?</div>
+                    <div class="text-sm text-gray-600 mt-1 faq-desc">AI పంచాయత్ సేవల గురించి తెలుసుకోండి</div>
+                </button>
+                <button class="faq-item text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-question="cropInsurance">
+                    <div class="font-medium text-gray-800 faq-question">పంట బీమా ఎలా పొందాలి?</div>
+                    <div class="text-sm text-gray-600 mt-1 faq-desc">PMFBY స్కీమ్ వివరాలు</div>
+                </button>
+                <button class="faq-item text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-question="rationCard">
+                    <div class="font-medium text-gray-800 faq-question">రేషన్ కార్డ్ దరఖాస్తు ప్రక్రియ?</div>
+                    <div class="text-sm text-gray-600 mt-1 faq-desc">అవసరమైన పత్రాలు మరియు ప్రక్రియ</div>
+                </button>
+                <button class="faq-item text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-question="pension">
+                    <div class="font-medium text-gray-800 faq-question">పెన్షన్ పథకాలు ఏవి?</div>
+                    <div class="text-sm text-gray-600 mt-1 faq-desc">వృద్ధాప్య, వితంతు, వికలాంగుల పెన్షన్</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl">
+                <div class="text-green-600 text-3xl mb-3">🎤</div>
+                <h4 class="font-bold text-gray-800 mb-2" id="voiceFeatureTitle">వాయిస్ సపోర్ట్</h4>
+                <p class="text-gray-600 text-sm" id="voiceFeatureDesc">మీ భాషలో మాట్లాడండి, మేము అర్థం చేసుకుంటాము</p>
+            </div>
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
+                <div class="text-blue-600 text-3xl mb-3">🌐</div>
+                <h4 class="font-bold text-gray-800 mb-2" id="multiLangTitle">మల్టీ లాంగ్వేజ్</h4>
+                <p class="text-gray-600 text-sm" id="multiLangDesc">తెలుగు, ఇంగ్లీష్, హిందీలో అందుబాటులో</p>
+            </div>
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl">
+                <div class="text-purple-600 text-3xl mb-3">⚡</div>
+                <h4 class="font-bold text-gray-800 mb-2" id="instantTitle">తక్షణ సమాధానాలు</h4>
+                <p class="text-gray-600 text-sm" id="instantDesc">24/7 అందుబాటులో ఉన్న AI సహాయకుడు</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Knowledge base with more training data
+        const knowledgeBase = {
+            te: {
+                // Greetings and basic interactions
+                'greeting': {
+                    keywords: ['హలో', 'నమస్కారం', 'హాయ్', 'hello', 'hi', 'hey', 'namaste', 'नमस्ते', 'हैलो'],
+                    response: 'నమస్కారం! నేను AI పంచాయత్. మీకు ఎలాంటి సహాయం కావాలి? మీరు పంట బీమా, రేషన్ కార్డ్, భూమి రికార్డులు, లేదా ఇతర ప్రభుత్వ పథకాల గురించి అడగవచ్చు.'
+                },
+                'help': {
+                    keywords: ['సహాయం', 'help', 'మీరు ఏమి చేయగలరు', 'what can you do', 'क्या कर सकते हैं', 'मदद'],
+                    response: 'నేను మీకు ఈ విషయాలలో సహాయం చేయగలను:\n\n🌾 వ్యవసాయ సేవలు - పంట బీమా, రైతు భరోసా\n📋 పత్రాలు - రేషన్ కార్డ్, ఆధార్, పాస్‌పోర్ట్\n🏠 భూమి రికార్డులు - పట్టా, సర్వే\n💰 ప్రభుత్వ పథకాలు - పెన్షన్, స్కాలర్‌షిప్\n📞 సంప్రదింపులు - అధికారుల వివరాలు\n⚡ బిల్లు చెల్లింపులు - విద్యుత్, నీరు'
+                },
+                'thanks': {
+                    keywords: ['ధన్యవాదాలు', 'thank you', 'thanks', 'धन्यवाद', 'शुक्रिया'],
+                    response: 'మీకు స్వాగతం! ఇంకా ఏమైనా సహాయం కావాలంటే అడగండి. నేను ఎల్లప్పుడూ మీ సేవలో ఉన్నాను.'
+                },
+                
+                // Agriculture related
+                'పంట బీమా': {
+                    keywords: ['పంట', 'బీమా', 'PMFBY', 'crop', 'insurance', 'फसल', 'बीमा', 'ఫసల్', 'ఇన్సూరెన్స్'],
+                    response: '🌾 పంట బీమా (PMFBY) వివరాలు:\n\n📝 దరఖాస్తు ప్రక్రియ:\n• గ్రామ వ్యవసాయ అధికారి వద్ద\n• CSC కేంద్రం లేదా బ్యాంక్‌లో\n• ఆన్‌లైన్ - pmfby.gov.in\n\n📋 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్\n• భూమి పత్రాలు (పట్టా/పహాణి)\n• బ్యాంక్ పాస్‌బుక్\n• పంట వివరాలు\n\n⏰ ముఖ్య తేదీలు:\n• ఖరీఫ్: జూలై 31\n• రబీ: డిసెంబర్ 31\n\n💰 ప్రీమియం రేట్లు:\n• ఖరీఫ్: 2%\n• రబీ: 1.5%'
+                },
+                'రేషన్ కార్డ్': {
+                    keywords: ['రేషన్', 'కార్డ్', 'ration', 'card', 'राशन', 'कार्ड', 'రేషన్‌కార్డ్'],
+                    response: '📋 రేషన్ కార్డ్ దరఖాస్తు:\n\n🏢 దరఖాస్తు చేసే చోట:\n• గ్రామ/వార్డ్ సచివాలయం\n• MeeBhoomi పోర్టల్\n• AP Land Records వెబ్‌సైట్\n\n📄 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్ (కుటుంబ సభ్యులందరిది)\n• నివాస ప్రమాణ పత్రం\n• ఆదాయ ప్రమాణ పత్రం\n• కుటుంబ వివరాలు\n• పాస్‌పోర్ట్ సైజ్ ఫోటోలు\n\n⏱️ ప్రాసెసింగ్ టైమ్: 15-30 రోజులు\n💰 ఫీజు: ₹10'
+                },
+                'భూమి రికార్డులు': {
+                    keywords: ['భూమి', 'రికార్డులు', 'పట్టా', 'land', 'records', 'patta', 'भूमि', 'रिकॉर्ड', 'पट्टा', 'సర్వే', 'survey'],
+                    response: '🏠 భూమి రికార్డుల సేవలు:\n\n🌐 ఆన్‌లైన్ చూడటానికి:\n• Webland పోర్టల్ - webland.ap.gov.in\n• AP Land Records\n• Village Revenue Records\n\n📊 అందుబాటులో ఉన్న రికార్డులు:\n• పట్టా పాస్‌బుక్\n• పహాణి/1-B రిజిస్టర్\n• సర్వే సెటిల్‌మెంట్\n• మ్యూటేషన్ రిజిస్టర్\n\n🏢 ఆఫ్‌లైన్ సేవలు:\n• గ్రామ రెవిన్యూ అధికారి\n• VRO కార్యాలయం\n• MRO కార్యాలయం\n\n💰 ఫీజు: ₹10-50'
+                },
+                'ఆధార్ కార్డ్': {
+                    keywords: ['ఆధార్', 'aadhar', 'aadhaar', 'आधार', 'ఆధార్‌కార్డ్', 'అధార్'],
+                    response: '🆔 ఆధార్ కార్డ్ సేవలు:\n\n📝 కొత్త ఆధార్ కోసం:\n• CSC కేంద్రం\n• పోస్ట్ ఆఫీస్\n• ఆధార్ కేంద్రం\n\n🔄 అప్‌డేట్ సేవలు:\n• చిరునామా మార్చడం\n• మొబైల్ నంబర్ అప్‌డేట్\n• ఫోటో మార్చడం\n• పేరు కరెక్షన్\n\n📱 ఆన్‌లైన్ సేవలు:\n• uidai.gov.in\n• ఆధార్ డౌన్‌లోడ్\n• వర్చువల్ ID\n\n💰 ఫీజు: కొత్తది - ఉచితం, అప్‌డేట్ - ₹50'
+                },
+                'పాస్‌పోర్ట్': {
+                    keywords: ['పాస్పోర్ట్', 'passport', 'पासपोर्ट', 'పాస్‌పోర్ట్‌'],
+                    response: '✈️ పాస్‌పోర్ట్ దరఖాస్తు:\n\n🌐 ఆన్‌లైన్ దరఖాస్తు:\n• passportindia.gov.in\n• అపాయింట్‌మెంట్ బుక్ చేయండి\n\n📋 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్\n• జన్మ ధృవీకరణ పత్రం\n• చిరునామా రుజువు\n• 10వ తరగతి మార్క్ షీట్\n\n🏢 దరఖాస్తు చేసే చోట:\n• పాస్‌పోర్ట్ సేవా కేంద్రం (PSK)\n• పోస్ట్ ఆఫీస్ పాస్‌పోర్ట్ సేవా కేంద్రం\n\n💰 ఫీజు: ₹1,500 (సాధారణ), ₹3,500 (తత్కాలం)'
+                },
+                'పెన్షన్': {
+                    keywords: ['పెన్షన్', 'pension', 'पेंशन', 'వృద్ధాప్య', 'వితంతు', 'వికలాంగ'],
+                    response: '👴 పెన్షన్ పథకాలు:\n\n🔹 వృద్ధాప్య పెన్షన్:\n• వయస్సు: 65+ సంవత్సరాలు\n• మొత్తం: ₹3,000/నెల\n\n🔹 వితంతు పెన్షన్:\n• వయస్సు: 18-59 సంవత్సరాలు\n• మొత్తం: ₹2,500/నెల\n\n🔹 వికలాంగుల పెన్షన్:\n• వికలాంగత: 40% మరియు అంతకు మించి\n• మొత్తం: ₹3,000/నెల\n\n📝 దరఖాస్తు:\n• గ్రామ/వార్డ్ సచివాలయం\n• YSR Pension Kanuka పోర్టల్\n\n📋 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్\n• వయస్సు రుజువు\n• ఆదాయ ప్రమాణ పత్రం\n• బ్యాంక్ పాస్‌బుక్'
+                },
+                'విద్యుత్ బిల్లు': {
+                    keywords: ['విద్యుత్', 'బిల్లు', 'electricity', 'bill', 'current', 'बिजली', 'करंट', 'ఎలక్ట్రిసిటీ'],
+                    response: '⚡ విద్యుత్ బిల్లు సేవలు:\n\n💳 ఆన్‌లైన్ చెల్లింపు:\n• APSPDCL వెబ్‌సైట్\n• PayTM, PhonePe, GooglePay\n• నెట్ బ్యాంకింగ్\n\n🏢 ఆఫ్‌లైన్ చెల్లింపు:\n• ఎలక్ట్రిసిటీ బోర్డ్ కార్యాలయం\n• CSC కేంద్రం\n• అధికృత కలెక్షన్ కేంద్రాలు\n\n📱 మొబైల్ యాప్:\n• APSPDCL Mobile App\n• బిల్లు వ్యూ & పేమెంట్\n\n🔧 ఇతర సేవలు:\n• కొత్త కనెక్షన్\n• మీటర్ రీడింగ్ ఫిర్యాదు\n• లోడ్ పెంచడం/తగ్గించడం'
+                },
+                'స్కాలర్‌షిప్': {
+                    keywords: ['స్కాలర్షిప్', 'scholarship', 'छात्रवृत्ति', 'విద్యార్థి', 'student', 'స్కాలర్‌షిప్‌'],
+                    response: '🎓 స్కాలర్‌షిప్ పథకాలు:\n\n📚 ప్రీ-మెట్రిక్:\n• తరగతులు: 1-10\n• మొత్తం: ₹1,000-15,000\n\n📖 పోస్ట్-మెట్రిక్:\n• తరగతులు: 11-12, డిగ్రీ\n• మొత్తం: ₹2,000-20,000\n\n🌐 దరఖాస్తు:\n• NSP పోర్టల్ - scholarships.gov.in\n• AP Welfare Department\n\n📋 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్\n• ఆదాయ ప్రమాణ పత్రం\n• కుల ప్రమాణ పత్రం\n• మార్క్ షీట్లు\n• బ్యాంక్ పాస్‌బుక్\n\n⏰ దరఖాస్తు చివరి తేదీ: అక్టోబర్ 31'
+                },
+                'జాబ్ కార్డ్': {
+                    keywords: ['జాబ్', 'కార్డ్', 'job card', 'MGNREGA', 'मनरेगा', 'మనరేగా', 'employment'],
+                    response: '💼 జాబ్ కార్డ్ (MGNREGA):\n\n📝 దరఖాస్తు ప్రక్రియ:\n• గ్రామ పంచాయతీ కార్యాలయం\n• గ్రామ రోజగార్ సహాయకుడి వద్ద\n\n💰 వేతనం:\n• రోజువారీ: ₹309\n• గ్యారెంటీ: 100 రోజుల పని\n\n📋 అవసరమైన పత్రాలు:\n• ఆధార్ కార్డ్\n• రేషన్ కార్డ్\n• బ్యాంక్ పాస్‌బుక్\n• పాస్‌పోర్ట్ సైజ్ ఫోటో\n\n🌐 ఆన్‌లైన్ స్టేటస్:\n• nrega.nic.in\n• జాబ్ కార్డ్ స్టేటస్ చెక్ చేయండి\n\n⚠️ ముఖ్యమైనది: 15 రోజుల్లో పని లేకపోతే నిరుద్యోగ భత్యం'
+                }
+            },
+            en: {
+                // Greetings and basic interactions
+                'greeting': {
+                    keywords: ['hello', 'hi', 'hey', 'namaste', 'హలో', 'నమస్కారం', 'नमस्ते', 'हैलो'],
+                    response: 'Hello! I am AI Panchayat. How can I help you? You can ask about crop insurance, ration cards, land records, or other government schemes.'
+                },
+                'help': {
+                    keywords: ['help', 'what can you do', 'సహాయం', 'मदद', 'क्या कर सकते हैं'],
+                    response: 'I can help you with:\n\n🌾 Agriculture Services - Crop insurance, Farmer schemes\n📋 Documents - Ration card, Aadhaar, Passport\n🏠 Land Records - Patta, Survey records\n💰 Government Schemes - Pension, Scholarship\n📞 Contacts - Official details\n⚡ Bill Payments - Electricity, Water'
+                },
+                'thanks': {
+                    keywords: ['thank you', 'thanks', 'ধন্যবাদ', 'धन्यवाद', 'ధన্యవాదాలు'],
+                    response: 'You\'re welcome! Feel free to ask if you need any more help. I\'m always here to assist you.'
+                },
+                
+                // Agriculture related
+                'Crop Insurance': {
+                    keywords: ['crop', 'insurance', 'PMFBY', 'పంట', 'బీమా', 'फसल', 'बीमा'],
+                    response: '🌾 Crop Insurance (PMFBY) Details:\n\n📝 Application Process:\n• Village Agriculture Officer\n• CSC Center or Bank\n• Online - pmfby.gov.in\n\n📋 Required Documents:\n• Aadhaar Card\n• Land documents (Patta/Pahani)\n• Bank Passbook\n• Crop details\n\n⏰ Important Dates:\n• Kharif: July 31\n• Rabi: December 31\n\n💰 Premium Rates:\n• Kharif: 2%\n• Rabi: 1.5%'
+                },
+                'Ration Card': {
+                    keywords: ['ration', 'card', 'రేషన్', 'కార్డ్', 'राशन', 'कार्ड'],
+                    response: '📋 Ration Card Application:\n\n🏢 Where to Apply:\n• Village/Ward Secretariat\n• MeeBhoomi Portal\n• AP Land Records Website\n\n📄 Required Documents:\n• Aadhaar Card (all family members)\n• Residence Certificate\n• Income Certificate\n• Family details\n• Passport size photos\n\n⏱️ Processing Time: 15-30 days\n💰 Fee: ₹10'
+                },
+                'Land Records': {
+                    keywords: ['land', 'records', 'patta', 'భూమి', 'రికార్డులు', 'पट्टा', 'survey'],
+                    response: '🏠 Land Records Services:\n\n🌐 Online Access:\n• Webland Portal - webland.ap.gov.in\n• AP Land Records\n• Village Revenue Records\n\n📊 Available Records:\n• Patta Passbook\n• Pahani/1-B Register\n• Survey Settlement\n• Mutation Register\n\n🏢 Offline Services:\n• Village Revenue Officer\n• VRO Office\n• MRO Office\n\n💰 Fee: ₹10-50'
+                },
+                'Aadhaar Card': {
+                    keywords: ['aadhaar', 'aadhar', 'आधार', 'ఆధార్'],
+                    response: '🆔 Aadhaar Card Services:\n\n📝 New Aadhaar:\n• CSC Center\n• Post Office\n• Aadhaar Center\n\n🔄 Update Services:\n• Address change\n• Mobile number update\n• Photo change\n• Name correction\n\n📱 Online Services:\n• uidai.gov.in\n• Aadhaar download\n• Virtual ID\n\n💰 Fee: New - Free, Update - ₹50'
+                },
+                'Passport': {
+                    keywords: ['passport', 'पासपोर्ट', 'పాస్పోర్ట్'],
+                    response: '✈️ Passport Application:\n\n🌐 Online Application:\n• passportindia.gov.in\n• Book appointment\n\n📋 Required Documents:\n• Aadhaar Card\n• Birth Certificate\n• Address Proof\n• 10th Class Mark Sheet\n\n🏢 Application Centers:\n• Passport Seva Kendra (PSK)\n• Post Office Passport Seva Kendra\n\n💰 Fee: ₹1,500 (Normal), ₹3,500 (Tatkal)'
+                },
+                'Pension': {
+                    keywords: ['pension', 'पेंशन', 'పెన్షన్', 'old age', 'widow'],
+                    response: '👴 Pension Schemes:\n\n🔹 Old Age Pension:\n• Age: 65+ years\n• Amount: ₹3,000/month\n\n🔹 Widow Pension:\n• Age: 18-59 years\n• Amount: ₹2,500/month\n\n🔹 Disability Pension:\n• Disability: 40% and above\n• Amount: ₹3,000/month\n\n📝 Application:\n• Village/Ward Secretariat\n• YSR Pension Kanuka Portal\n\n📋 Required Documents:\n• Aadhaar Card\n• Age proof\n• Income Certificate\n• Bank Passbook'
+                },
+                'Electricity Bill': {
+                    keywords: ['electricity', 'bill', 'current', 'विद्युत', 'बिजली', 'విద్యుత్'],
+                    response: '⚡ Electricity Bill Services:\n\n💳 Online Payment:\n• APSPDCL Website\n• PayTM, PhonePe, GooglePay\n• Net Banking\n\n🏢 Offline Payment:\n• Electricity Board Office\n• CSC Center\n• Authorized Collection Centers\n\n📱 Mobile App:\n• APSPDCL Mobile App\n• Bill View & Payment\n\n🔧 Other Services:\n• New Connection\n• Meter Reading Complaint\n• Load Enhancement/Reduction'
+                },
+                'Scholarship': {
+                    keywords: ['scholarship', 'छात्रवृत्ति', 'స్కాలర్షిప్', 'student'],
+                    response: '🎓 Scholarship Schemes:\n\n📚 Pre-Matric:\n• Classes: 1-10\n• Amount: ₹1,000-15,000\n\n📖 Post-Matric:\n• Classes: 11-12, Degree\n• Amount: ₹2,000-20,000\n\n🌐 Application:\n• NSP Portal - scholarships.gov.in\n• AP Welfare Department\n\n📋 Required Documents:\n• Aadhaar Card\n• Income Certificate\n• Caste Certificate\n• Mark Sheets\n• Bank Passbook\n\n⏰ Last Date: October 31'
+                },
+                'Job Card': {
+                    keywords: ['job card', 'MGNREGA', 'employment', 'जॉब कार्ड', 'జాబ్ కార్డ్'],
+                    response: '💼 Job Card (MGNREGA):\n\n📝 Application Process:\n• Village Panchayat Office\n• Village Employment Assistant\n\n💰 Wages:\n• Daily: ₹309\n• Guarantee: 100 days work\n\n📋 Required Documents:\n• Aadhaar Card\n• Ration Card\n• Bank Passbook\n• Passport size photo\n\n🌐 Online Status:\n• nrega.nic.in\n• Check job card status\n\n⚠️ Important: Unemployment allowance if no work within 15 days'
+                }
+            },
+            hi: {
+                // Greetings and basic interactions
+                'greeting': {
+                    keywords: ['नमस्ते', 'हैलो', 'हाय', 'hello', 'hi', 'హలో', 'నమస్కారం'],
+                    response: 'नमस्ते! मैं AI पंचायत हूं। मैं आपकी कैसे सहायता कर सकता हूं? आप फसल बीमा, राशन कार्ड, भूमि रिकॉर्ड या अन्य सरकारी योजनाओं के बारे में पूछ सकते हैं।'
+                },
+                'help': {
+                    keywords: ['मदद', 'सहायता', 'क्या कर सकते हैं', 'help', 'what can you do', 'సహాయం'],
+                    response: 'मैं आपकी इन विषयों में सहायता कर सकता हूं:\n\n🌾 कृषि सेवाएं - फसल बीमा, किसान योजनाएं\n📋 दस्तावेज - राशन कार्ड, आधार, पासपोर्ट\n🏠 भूमि रिकॉर्ड - पट्टा, सर्वे रिकॉर्ड\n💰 सरकारी योजनाएं - पेंशन, छात्रवृत्ति\n📞 संपर्क - अधिकारियों का विवरण\n⚡ बिल भुगतान - बिजली, पानी'
+                },
+                'thanks': {
+                    keywords: ['धन्यवाद', 'शुक्रिया', 'thank you', 'thanks', 'ధన్యవాదాలు'],
+                    response: 'आपका स्वागत है! यदि आपको और कोई सहायता चाहिए तो कृपया पूछें। मैं हमेशा आपकी सेवा में हूं।'
+                },
+                
+                // Agriculture related
+                'फसल बीमा': {
+                    keywords: ['फसल', 'बीमा', 'PMFBY', 'crop', 'insurance', 'పంట', 'బీమా'],
+                    response: '🌾 फसल बीमा (PMFBY) विवरण:\n\n📝 आवेदन प्रक्रिया:\n• गांव कृषि अधिकारी के पास\n• CSC केंद्र या बैंक में\n• ऑनलाइन - pmfby.gov.in\n\n📋 आवश्यक दस्तावेज:\n• आधार कार्ड\n• भूमि दस्तावेज (पट्टा/पहानी)\n• बैंक पासबुक\n• फसल विवरण\n\n⏰ महत्वपूर्ण तिथियां:\n• खरीफ: 31 जुलाई\n• रबी: 31 दिसंबर\n\n💰 प्रीमियम दरें:\n• खरीफ: 2%\n• रबी: 1.5%'
+                },
+                'राशन कार्ड': {
+                    keywords: ['राशन', 'कार्ड', 'ration', 'card', 'రేషన్', 'కార్డ్'],
+                    response: '📋 राशन कार्ड आवेदन:\n\n🏢 आवेदन कहां करें:\n• गांव/वार्ड सचिवालय\n• MeeBhoomi पोर्टल\n• AP Land Records वेबसाइट\n\n📄 आवश्यक दस्तावेज:\n• आधार कार्ड (सभी परिवारजनों का)\n• निवास प्रमाण पत्र\n• आय प्रमाण पत्र\n• परिवार का विवरण\n• पासपोर्ट साइज फोटो\n\n⏱️ प्रोसेसिंग समय: 15-30 दिन\n💰 फीस: ₹10'
+                },
+                'भूमि रिकॉर्ड': {
+                    keywords: ['भूमि', 'रिकॉर्ड', 'पट्टा', 'land', 'records', 'patta', 'భूమి', 'రికార్డులు', 'सर्वे'],
+                    response: '🏠 भूमि रिकॉर्ड सेवाएं:\n\n🌐 ऑनलाइन देखने के लिए:\n• Webland पोर्टल - webland.ap.gov.in\n• AP Land Records\n• Village Revenue Records\n\n📊 उपलब्ध रिकॉर्ड:\n• पट्टा पासबुक\n• पहानी/1-B रजिस्टर\n• सर्वे सेटलमेंट\n• म्यूटेशन रजिस्टर\n\n🏢 ऑफलाइन सेवाएं:\n• गांव राजस्व अधिकारी\n• VRO कार्यालय\n• MRO कार्यालय\n\n💰 फीस: ₹10-50'
+                },
+                'आधार कार्ड': {
+                    keywords: ['आधार', 'aadhaar', 'aadhar', 'ఆధార్'],
+                    response: '🆔 आधार कार्ड सेवाएं:\n\n📝 नया आधार:\n• CSC केंद्र\n• पोस्ट ऑफिस\n• आधार केंद्र\n\n🔄 अपडेट सेवाएं:\n• पता बदलना\n• मोबाइल नंबर अपडेट\n• फोटो बदलना\n• नाम सुधार\n\n📱 ऑनलाइन सेवाएं:\n• uidai.gov.in\n• आधार डाउनलोड\n• वर्चुअल ID\n\n💰 फीस: नया - मुफ्त, अपडेट - ₹50'
+                },
+                'पासपोर्ट': {
+                    keywords: ['पासपोर्ट', 'passport', 'పాస్పోర్ట్'],
+                    response: '✈️ पासपोर्ट आवेदन:\n\n🌐 ऑनलाइन आवेदन:\n• passportindia.gov.in\n• अपॉइंटमेंट बुक करें\n\n📋 आवश्यक दस्तावेज:\n• आधार कार्ड\n• जन्म प्रमाण पत्र\n• पता प्रमाण\n• 10वीं कक्षा मार्क शीट\n\n🏢 आवेदन केंद्र:\n• पासपोर्ट सेवा केंद्र (PSK)\n• पोस्ट ऑफिस पासपोर्ट सेवा केंद्र\n\n💰 फीस: ₹1,500 (सामान्य), ₹3,500 (तत्काल)'
+                },
+                'पेंशन': {
+                    keywords: ['पेंशन', 'pension', 'పెన్షన్', 'वृद्धावस्था', 'विधवा', 'विकलांग'],
+                    response: '👴 पेंशन योजनाएं:\n\n🔹 वृद्धावस्था पेंशन:\n• आयु: 65+ वर्ष\n• राशि: ₹3,000/माह\n\n🔹 विधवा पेंशन:\n• आयु: 18-59 वर्ष\n• राशि: ₹2,500/माह\n\n🔹 विकलांग पेंशन:\n• विकलांगता: 40% और अधिक\n• राशि: ₹3,000/माह\n\n📝 आवेदन:\n• गांव/वार्ड सचिवालय\n• YSR Pension Kanuka पोर्टल\n\n📋 आवश्यक दस्तावेज:\n• आधार कार्ड\n• आयु प्रमाण\n• आय प्रमाण पत्र\n• बैंक पासबुक'
+                },
+                'बिजली बिल': {
+                    keywords: ['बिजली', 'बिल', 'electricity', 'bill', 'current', 'విద్యుత్'],
+                    response: '⚡ बिजली बिल सेवाएं:\n\n💳 ऑनलाइन भुगतान:\n• APSPDCL वेबसाइट\n• PayTM, PhonePe, GooglePay\n• नेट बैंकिंग\n\n🏢 ऑफलाइन भुगतान:\n• बिजली बोर्ड कार्यालय\n• CSC केंद्र\n• अधिकृत संग्रह केंद्र\n\n📱 मोबाइल ऐप:\n• APSPDCL Mobile App\n• बिल देखें और भुगतान\n\n🔧 अन्य सेवाएं:\n• नया कनेक्शन\n• मीटर रीडिंग शिकायत\n• लोड बढ़ाना/घटाना'
+                },
+                'छात्रवृत्ति': {
+                    keywords: ['छात्रवृत्ति', 'scholarship', 'స్కాలర్షిప్', 'विद्यार्थी', 'student'],
+                    response: '🎓 छात्रवृत्ति योजनाएं:\n\n📚 प्री-मैट्रिक:\n• कक्षाएं: 1-10\n• राशि: ₹1,000-15,000\n\n📖 पोस्ट-मैट्रिक:\n• कक्षाएं: 11-12, डिग्री\n• राशि: ₹2,000-20,000\n\n🌐 आवेदन:\n• NSP पोर्टल - scholarships.gov.in\n• AP Welfare Department\n\n📋 आवश्यक दस्तावेज:\n• आधार कार्ड\n• आय प्रमाण पत्र\n• जाति प्रमाण पत्र\n• मार्क शीट\n• बैंक पासबुक\n\n⏰ अंतिम तिथि: 31 अक्टूबर'
+                },
+                'जॉब कार्ड': {
+                    keywords: ['जॉब', 'कार्ड', 'job card', 'MGNREGA', 'मनरेगा', 'రోజగార్', 'employment'],
+                    response: '💼 जॉब कार्ड (MGNREGA):\n\n📝 आवेदन प्रक्रिया:\n• गांव पंचायत कार्यालय\n• गांव रोजगार सहायक के पास\n\n💰 मजदूरी:\n• दैनिक: ₹309\n• गारंटी: 100 दिन काम\n\n📋 आवश्यक दस्तावेज:\n• आधार कार्ड\n• राशन कार्ड\n• बैंक पासबुक\n• पासपोर्ट साइज फोटो\n\n🌐 ऑनलाइन स्थिति:\n• nrega.nic.in\n• जॉब कार्ड स्थिति जांचें\n\n⚠️ महत्वपूर्ण: 15 दिन में काम नहीं मिले तो बेरोजगारी भत्ता'
+                }
+            }
+        };
+
+        // Language translations
+        const translations = {
+            te: {
+                headerSubtitle: 'గ్రామ సహాయకుడు',
+                welcomeTitle: 'స్వాగతం!',
+                welcomeDesc: 'గ్రామ పంచాయతీ సేవలు మరియు ప్రభుత్వ పథకాల గురించి అడగండి',
+                agriTitle: '🌾 వ్యవసాయ సేవలు',
+                agriDesc: 'పంట బీమా, రైతు భీమా',
+                docsTitle: '📋 పత్రాలు',
+                docsDesc: 'రేషన్ కార్డ్, భూమి రికార్డులు',
+                contactTitle: '📞 సంప్రదింపులు',
+                contactDesc: 'పంచాయతీ అధికారులు',
+                inputPlaceholder: 'మీ ప్రశ్న టైప్ చేయండి...',
+                recordingText: 'రికార్డింగ్ చేస్తున్నాం...',
+                listenText: 'వినండి',
+                botGreeting: 'నమస్కారం! నేను AI పంచాయత్. మీకు ఎలాంటి సహాయం కావాలి?',
+                fallbackResponse: 'ఈ సమాచారం అందుబాటులో లేదు. మీ గ్రామ పంచాయతీ కార్యాలయాన్ని సంప్రదించండి.',
+                politeClosing: '\n\nఇంకా ఏమైనా సహాయం కావాలంటే అడగండి.',
+                quickActions: {
+                    cropInsurance: 'పంట బీమా',
+                    rationCard: 'రేషన్ కార్డ్',
+                    landRecords: 'భూమి రికార్డులు',
+                    pension: 'పెన్షన్',
+                    aadhaar: 'ఆధార్ కార్డ్',
+                    scholarship: 'స్కాలర్‌షిప్',
+                    jobCard: 'జాబ్ కార్డ్',
+                    electricity: 'విద్యుత్ బిల్లు'
+                },
+                faqTitle: 'తరచుగా అడిగే ప్రశ్నలు',
+                voiceFeatureTitle: 'వాయిస్ సపోర్ట్',
+                voiceFeatureDesc: 'మీ భాషలో మాట్లాడండి, మేము అర్థం చేసుకుంటాము',
+                multiLangTitle: 'మల్టీ లాంగ్వేజ్',
+                multiLangDesc: 'తెలుగు, ఇంగ్లీష్, హిందీలో అందుబాటులో',
+                instantTitle: 'తక్షణ సమాధానాలు',
+                instantDesc: '24/7 అందుబాటులో ఉన్న AI సహాయకుడు',
+                faqQuestions: {
+                    help: 'మీరు ఏమి చేయగలరు?',
+                    cropInsurance: 'పంట బీమా ఎలా పొందాలి?',
+                    rationCard: 'రేషన్ కార్డ్ దరఖాస్తు ప్రక్రియ?',
+                    pension: 'పెన్షన్ పథకాలు ఏవి?'
+                },
+                faqDescriptions: {
+                    help: 'AI పంచాయత్ సేవల గురించి తెలుసుకోండి',
+                    cropInsurance: 'PMFBY స్కీమ్ వివరాలు',
+                    rationCard: 'అవసరమైన పత్రాలు మరియు ప్రక్రియ',
+                    pension: 'వృద్ధాప్య, వితంతు, వికలాంగుల పెన్షన్'
+                }
+            },
+            en: {
+                headerSubtitle: 'Village Assistant',
+                welcomeTitle: 'Welcome!',
+                welcomeDesc: 'Ask about village panchayat services and government schemes',
+                agriTitle: '🌾 Agriculture Services',
+                agriDesc: 'Crop Insurance, Farmer Insurance',
+                docsTitle: '📋 Documents',
+                docsDesc: 'Ration Card, Land Records',
+                contactTitle: '📞 Contacts',
+                contactDesc: 'Panchayat Officials',
+                inputPlaceholder: 'Type your question...',
+                recordingText: 'Recording...',
+                listenText: 'Listen',
+                botGreeting: 'Hello! I am AI Panchayat. How can I help you?',
+                fallbackResponse: 'This information is not available. Please contact your village panchayat office.',
+                politeClosing: '\n\nPlease ask if you need any more help.',
+                quickActions: {
+                    cropInsurance: 'Crop Insurance',
+                    rationCard: 'Ration Card',
+                    landRecords: 'Land Records',
+                    pension: 'Pension',
+                    aadhaar: 'Aadhaar Card',
+                    scholarship: 'Scholarship',
+                    jobCard: 'Job Card',
+                    electricity: 'Electricity Bill'
+                },
+                faqTitle: 'Frequently Asked Questions',
+                voiceFeatureTitle: 'Voice Support',
+                voiceFeatureDesc: 'Speak in your language, we understand',
+                multiLangTitle: 'Multi Language',
+                multiLangDesc: 'Available in Telugu, English, Hindi',
+                instantTitle: 'Instant Answers',
+                instantDesc: '24/7 available AI assistant',
+                faqQuestions: {
+                    help: 'What can you do?',
+                    cropInsurance: 'How to get crop insurance?',
+                    rationCard: 'Ration card application process?',
+                    pension: 'What are pension schemes?'
+                },
+                faqDescriptions: {
+                    help: 'Learn about AI Panchayat services',
+                    cropInsurance: 'PMFBY scheme details',
+                    rationCard: 'Required documents and process',
+                    pension: 'Old age, widow, disability pension'
+                }
+            },
+            hi: {
+                headerSubtitle: 'गांव सहायक',
+                welcomeTitle: 'स्वागत है!',
+                welcomeDesc: 'गांव पंचायत सेवाओं और सरकारी योजनाओं के बारे में पूछें',
+                agriTitle: '🌾 कृषि सेवाएं',
+                agriDesc: 'फसल बीमा, किसान बीमा',
+                docsTitle: '📋 दस्तावेज',
+                docsDesc: 'राशन कार्ड, भूमि रिकॉर्ड',
+                contactTitle: '📞 संपर्क',
+                contactDesc: 'पंचायत अधिकारी',
+                inputPlaceholder: 'अपना प्रश्न टाइप करें...',
+                recordingText: 'रिकॉर्डिंग कर रहे हैं...',
+                listenText: 'सुनें',
+                botGreeting: 'नमस्ते! मैं AI पंचायत हूं। मैं आपकी कैसे सहायता कर सकता हूं?',
+                fallbackResponse: 'यह जानकारी उपलब्ध नहीं है। कृपया अपने गांव पंचायत कार्यालय से संपर्क करें।',
+                politeClosing: '\n\nयदि आपको और कोई सहायता चाहिए तो कृपया पूछें।',
+                quickActions: {
+                    cropInsurance: 'फसल बीमा',
+                    rationCard: 'राशन कार्ड',
+                    landRecords: 'भूमि रिकॉर्ड',
+                    pension: 'पेंशन',
+                    aadhaar: 'आधार कार्ड',
+                    scholarship: 'छात्रवृत्ति',
+                    jobCard: 'जॉब कार्ड',
+                    electricity: 'बिजली बिल'
+                },
+                faqTitle: 'अक्सर पूछे जाने वाले प्रश्न',
+                voiceFeatureTitle: 'आवाज़ सहायता',
+                voiceFeatureDesc: 'अपनी भाषा में बोलें, हम समझते हैं',
+                multiLangTitle: 'बहुभाषी',
+                multiLangDesc: 'तेलुगु, अंग्रेजी, हिंदी में उपलब्ध',
+                instantTitle: 'तुरंत जवाब',
+                instantDesc: '24/7 उपलब्ध AI सहायक',
+                faqQuestions: {
+                    help: 'आप क्या कर सकते हैं?',
+                    cropInsurance: 'फसल बीमा कैसे प्राप्त करें?',
+                    rationCard: 'राशन कार्ड आवेदन प्रक्रिया?',
+                    pension: 'पेंशन योजनाएं क्या हैं?'
+                },
+                faqDescriptions: {
+                    help: 'AI पंचायत सेवाओं के बारे में जानें',
+                    cropInsurance: 'PMFBY योजना विवरण',
+                    rationCard: 'आवश्यक दस्तावेज और प्रक्रिया',
+                    pension: 'वृद्धावस्था, विधवा, विकलांग पेंशन'
+                }
+            }
+        };
+
+        // DOM elements
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const themeToggle = document.getElementById('themeToggle');
+        const languageToggle = document.getElementById('languageToggle');
+
+        let isRecording = false;
+        let isDarkMode = false;
+        let currentLanguage = 'te';
+
+        // Add message to chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start space-x-3 chat-bubble ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+            
+            const avatarClass = isUser ? 'bg-blue-100' : 'bg-green-100';
+            const avatarIconColor = isUser ? 'text-blue-600' : 'text-green-600';
+            const bubbleClass = isUser ? 'bg-blue-50' : 'bg-green-50';
+            
+            messageDiv.innerHTML = `
+                <div class="${avatarClass} p-2 rounded-full">
+                    <svg class="w-5 h-5 ${avatarIconColor}" fill="currentColor" viewBox="0 0 24 24">
+                        ${isUser ? 
+                            '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>' :
+                            '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>'
+                        }
+                    </svg>
+                </div>
+                <div class="${bubbleClass} rounded-lg p-3 max-w-xs">
+                    <p class="text-gray-800">${message}</p>
+                    ${!isUser ? `
+                        <button class="mt-2 text-green-600 hover:text-green-700 text-sm flex items-center space-x-1 speak-btn">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                            </svg>
+                            <span>${translations[currentLanguage].listenText}</span>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Add speak functionality
+            if (!isUser) {
+                const speakBtn = messageDiv.querySelector('.speak-btn');
+                speakBtn.addEventListener('click', () => speakText(message));
+            }
+        }
+
+        // Update UI language
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            
+            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+            document.getElementById('welcomeTitle').textContent = t.welcomeTitle;
+            document.getElementById('welcomeDesc').textContent = t.welcomeDesc;
+            document.getElementById('agriTitle').textContent = t.agriTitle;
+            document.getElementById('agriDesc').textContent = t.agriDesc;
+            document.getElementById('docsTitle').textContent = t.docsTitle;
+            document.getElementById('docsDesc').textContent = t.docsDesc;
+            document.getElementById('contactTitle').textContent = t.contactTitle;
+            document.getElementById('contactDesc').textContent = t.contactDesc;
+            document.getElementById('messageInput').placeholder = t.inputPlaceholder;
+            document.getElementById('recordingText').textContent = t.recordingText;
+            
+            // Update language button text
+            const langLabels = { te: 'తె', en: 'EN', hi: 'हि' };
+            document.getElementById('langText').textContent = langLabels[currentLanguage];
+            
+            // Update quick action buttons
+            document.querySelectorAll('.quick-action').forEach(btn => {
+                const key = btn.getAttribute('data-key');
+                btn.querySelector('.quick-text').textContent = t.quickActions[key];
+            });
+
+            // Update FAQ section
+            document.getElementById('faqTitle').textContent = t.faqTitle;
+            document.querySelectorAll('.faq-item').forEach((item, index) => {
+                const questions = ['help', 'cropInsurance', 'rationCard', 'pension'];
+                const key = questions[index];
+                if (key && t.faqQuestions[key]) {
+                    item.querySelector('.faq-question').textContent = t.faqQuestions[key];
+                    item.querySelector('.faq-desc').textContent = t.faqDescriptions[key];
+                }
+            });
+
+            // Update feature section
+            document.getElementById('voiceFeatureTitle').textContent = t.voiceFeatureTitle;
+            document.getElementById('voiceFeatureDesc').textContent = t.voiceFeatureDesc;
+            document.getElementById('multiLangTitle').textContent = t.multiLangTitle;
+            document.getElementById('multiLangDesc').textContent = t.multiLangDesc;
+            document.getElementById('instantTitle').textContent = t.instantTitle;
+            document.getElementById('instantDesc').textContent = t.instantDesc;
+
+            // Update existing listen buttons
+            document.querySelectorAll('.speak-btn span').forEach(span => {
+                span.textContent = t.listenText;
+            });
+
+            // Clear chat and show new greeting
+            chatMessages.innerHTML = '';
+            setTimeout(() => {
+                addMessage(t.botGreeting);
+                speakText(t.botGreeting);
+            }, 500);
+        }
+
+        // Process user message and generate response
+        function processMessage(userMessage) {
+            const lowerMessage = userMessage.toLowerCase().trim();
+            let response = null;
+            const currentKB = knowledgeBase[currentLanguage];
+            const t = translations[currentLanguage];
+
+            // Enhanced matching algorithm
+            let bestMatch = null;
+            let maxScore = 0;
+
+            for (const [topic, data] of Object.entries(currentKB)) {
+                let score = 0;
+                
+                // Check for exact keyword matches (highest priority)
+                for (const keyword of data.keywords) {
+                    const keywordLower = keyword.toLowerCase();
+                    if (lowerMessage === keywordLower) {
+                        score += 100; // Exact match gets highest score
+                    } else if (lowerMessage.includes(keywordLower)) {
+                        score += 50; // Contains keyword
+                    } else if (keywordLower.includes(lowerMessage) && lowerMessage.length > 2) {
+                        score += 30; // Keyword contains user input
+                    }
+                    
+                    // Check for word-by-word matching
+                    const userWords = lowerMessage.split(' ');
+                    const keywordWords = keywordLower.split(' ');
+                    
+                    for (const userWord of userWords) {
+                        if (userWord.length > 2) { // Ignore very short words
+                            for (const keywordWord of keywordWords) {
+                                if (userWord === keywordWord) {
+                                    score += 20;
+                                } else if (userWord.includes(keywordWord) || keywordWord.includes(userWord)) {
+                                    score += 10;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestMatch = data.response;
+                }
+            }
+
+            // Use best match if score is high enough
+            if (bestMatch && maxScore >= 10) {
+                response = bestMatch;
+            } else {
+                // Additional fuzzy matching for common variations
+                const commonPatterns = {
+                    te: [
+                        { patterns: ['ఏమి చేయగలరు', 'ఏమి చేయగలవు', 'సహాయం', 'help', 'what'], response: currentKB['help']?.response },
+                        { patterns: ['నమస్కారం', 'హలో', 'హాయ్', 'hello', 'hi'], response: currentKB['greeting']?.response },
+                        { patterns: ['ధన్యవాదాలు', 'thanks', 'thank'], response: currentKB['thanks']?.response }
+                    ],
+                    en: [
+                        { patterns: ['what can you do', 'help', 'assist', 'support'], response: currentKB['help']?.response },
+                        { patterns: ['hello', 'hi', 'hey', 'namaste'], response: currentKB['greeting']?.response },
+                        { patterns: ['thank', 'thanks'], response: currentKB['thanks']?.response }
+                    ],
+                    hi: [
+                        { patterns: ['क्या कर सकते', 'मदद', 'सहायता', 'help'], response: currentKB['help']?.response },
+                        { patterns: ['नमस्ते', 'हैलो', 'hello', 'hi'], response: currentKB['greeting']?.response },
+                        { patterns: ['धन्यवाद', 'शुक्रिया', 'thanks'], response: currentKB['thanks']?.response }
+                    ]
+                };
+
+                const patterns = commonPatterns[currentLanguage] || [];
+                for (const pattern of patterns) {
+                    for (const p of pattern.patterns) {
+                        if (lowerMessage.includes(p.toLowerCase()) && pattern.response) {
+                            response = pattern.response;
+                            break;
+                        }
+                    }
+                    if (response) break;
+                }
+            }
+
+            // Fallback response
+            if (!response) {
+                response = t.fallbackResponse;
+            }
+
+            // Add polite closing only if it's not already there and not a greeting
+            if (!response.includes(t.politeClosing.trim()) && !response.includes('స్వాగతం') && !response.includes('Welcome') && !response.includes('स्वागत')) {
+                response += t.politeClosing;
+            }
+
+            return response;
+        }
+
+        // Text-to-speech function
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // Stop any ongoing speech first
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                const speechLangs = { te: 'te-IN', en: 'en-IN', hi: 'hi-IN' };
+                utterance.lang = speechLangs[currentLanguage];
+                utterance.rate = 0.8;
+                utterance.volume = 1.0;
+                
+                // Ensure it doesn't repeat
+                utterance.onend = () => {
+                    speechSynthesis.cancel();
+                };
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            messageInput.value = '';
+
+            // Simulate processing delay
+            setTimeout(() => {
+                const response = processMessage(message);
+                addMessage(response);
+                speakText(response);
+            }, 1000);
+        }
+
+        // Voice recognition
+        function startVoiceRecognition() {
+            // Check if browser supports speech recognition
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                const errorMessages = {
+                    te: 'వాయిస్ రికగ్నిషన్ మీ బ్రౌజర్‌లో అందుబాటులో లేదు। దయచేసి Chrome లేదా Edge బ్రౌజర్ ఉపయోగించండి।',
+                    en: 'Voice recognition is not available in your browser. Please use Chrome or Edge browser.',
+                    hi: 'आपके ब्राउज़र में वॉयस रिकग्निशन उपलब्ध नहीं है। कृपया Chrome या Edge ब्राउज़र का उपयोग करें।'
+                };
+                alert(errorMessages[currentLanguage]);
+                return;
+            }
+
+            // Stop any existing recognition
+            if (window.currentRecognition) {
+                window.currentRecognition.stop();
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            window.currentRecognition = recognition;
+            
+            const speechLangs = { te: 'te-IN', en: 'en-IN', hi: 'hi-IN' };
+            recognition.lang = speechLangs[currentLanguage];
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                console.log('Voice recognition started');
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceBtn.style.backgroundColor = '#ef4444';
+                voiceBtn.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.3)';
+                recordingIndicator.classList.remove('hidden');
+            };
+
+            recognition.onresult = (event) => {
+                console.log('Voice recognition result received');
+                const transcript = event.results[0][0].transcript.trim();
+                console.log('Transcript:', transcript);
+                
+                if (transcript) {
+                    messageInput.value = transcript;
+                    // Auto-send the message after a short delay
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 500);
+                }
+            };
+
+            recognition.onend = () => {
+                console.log('Voice recognition ended');
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.style.backgroundColor = '';
+                voiceBtn.style.boxShadow = '';
+                recordingIndicator.classList.add('hidden');
+                window.currentRecognition = null;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                
+                const errorMessages = {
+                    'no-speech': {
+                        te: 'మాట్లాడటం వినబడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.',
+                        en: 'No speech detected. Please try again.',
+                        hi: 'कोई आवाज़ नहीं सुनाई दी। कृपया फिर से कोशिश करें।'
+                    },
+                    'audio-capture': {
+                        te: 'మైక్రోఫోన్ యాక్సెస్ లేదు. దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి.',
+                        en: 'Microphone access denied. Please allow microphone permission.',
+                        hi: 'माइक्रोफ़ोन एक्सेस नहीं मिला। कृपया माइक्रोफ़ोन की अनुमति दें।'
+                    },
+                    'not-allowed': {
+                        te: 'మైక్రోఫోన్ అనుమతి లేదు. బ్రౌజర్ సెట్టింగ్స్‌లో మైక్రోఫోన్ అనుమతి ఇవ్వండి.',
+                        en: 'Microphone permission denied. Please enable microphone in browser settings.',
+                        hi: 'माइक्रोफ़ोन की अनुमति नहीं है। ब्राउज़र सेटिंग्स में माइक्रोफ़ोन की अनुमति दें।'
+                    }
+                };
+                
+                const errorMsg = errorMessages[event.error] || {
+                    te: 'వాయిస् రికగ్నిషన్ లో లోపం. దయచేసి మళ్లీ ప్రయత్నించండి.',
+                    en: 'Voice recognition error. Please try again.',
+                    hi: 'वॉयस रिकग्निशन में त्रुटि। कृपया फिर से कोशिश करें।'
+                };
+                
+                alert(errorMsg[currentLanguage]);
+                
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.style.backgroundColor = '';
+                voiceBtn.style.boxShadow = '';
+                recordingIndicator.classList.add('hidden');
+                window.currentRecognition = null;
+            };
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Failed to start recognition:', error);
+                const errorMessages = {
+                    te: 'వాయిస్ రికగ్నిషన్ ప్రారంభించడంలో లోపం. దయచేసి మళ్లీ ప్రయత్నించండి.',
+                    en: 'Failed to start voice recognition. Please try again.',
+                    hi: 'वॉयस रिकग्निशन शुरू करने में विफल। कृपया फिर से कोशिश करें।'
+                };
+                alert(errorMessages[currentLanguage]);
+            }
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        voiceBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                startVoiceRecognition();
+            }
+        });
+
+        // Language dropdown toggle
+        languageToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Language selection
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                currentLanguage = e.target.getAttribute('data-lang');
+                updateLanguage();
+                document.getElementById('languageDropdown').classList.add('hidden');
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            document.getElementById('languageDropdown').classList.add('hidden');
+        });
+
+        // Quick actions
+        document.querySelectorAll('.quick-action').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const key = e.currentTarget.getAttribute('data-key');
+                
+                // Map quick action keys to knowledge base keys
+                const keyMapping = {
+                    'cropInsurance': 'పంట బీమా',
+                    'rationCard': 'రేషన్ కార్డ్',
+                    'landRecords': 'భూమి రికార్డులు',
+                    'pension': 'పెన్షన్',
+                    'aadhaar': 'ఆధార్ కార్డ్',
+                    'scholarship': 'స్కాలర్‌షిప్',
+                    'jobCard': 'జాబ్ కార్డ్',
+                    'electricity': 'విద్యుత్ బిల్లు'
+                };
+                
+                // Get the appropriate query based on current language
+                let queryText = '';
+                if (currentLanguage === 'te') {
+                    queryText = keyMapping[key] || translations[currentLanguage].quickActions[key];
+                } else if (currentLanguage === 'en') {
+                    const englishMapping = {
+                        'cropInsurance': 'Crop Insurance',
+                        'rationCard': 'Ration Card',
+                        'landRecords': 'Land Records',
+                        'pension': 'Pension',
+                        'aadhaar': 'Aadhaar Card',
+                        'scholarship': 'Scholarship',
+                        'jobCard': 'Job Card',
+                        'electricity': 'Electricity Bill'
+                    };
+                    queryText = englishMapping[key];
+                } else if (currentLanguage === 'hi') {
+                    const hindiMapping = {
+                        'cropInsurance': 'फसल बीमा',
+                        'rationCard': 'राशन कार्ड',
+                        'landRecords': 'भूमि रिकॉर्ड',
+                        'pension': 'पेंशन',
+                        'aadhaar': 'आधार कार्ड',
+                        'scholarship': 'छात्रवृत्ति',
+                        'jobCard': 'जॉब कार्ड',
+                        'electricity': 'बिजली बिल'
+                    };
+                    queryText = hindiMapping[key];
+                }
+                
+                messageInput.value = queryText;
+                sendMessage();
+            });
+        });
+
+        // FAQ items
+        document.querySelectorAll('.faq-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const question = e.currentTarget.getAttribute('data-question');
+                const questionText = e.currentTarget.querySelector('.faq-question').textContent;
+                messageInput.value = questionText;
+                sendMessage();
+            });
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark', isDarkMode);
+        });
+
+        // Initialize with welcome message
+        setTimeout(() => {
+            const t = translations[currentLanguage];
+            speakText(t.botGreeting);
+        }, 1000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9684f94900cf2e8a',t:'MTc1NDA0NzUxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
