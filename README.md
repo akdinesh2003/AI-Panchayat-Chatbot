@@ -10,7 +10,7 @@ Built for **social impact**, this project empowers rural citizens by bridging th
 
 - 🎙️ **Voice Input & Output** in Telugu, Hindi, and English
 - 🗣️ **Natural Language Understanding** for governance-related queries
-- 📚 **Knowledge Base** covering:
+- 📚 **Knowledge Base** 
 🌾Crop Insurance
 📋Ration Card
 🏠Land Records
