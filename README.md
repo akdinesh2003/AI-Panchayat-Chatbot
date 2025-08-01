@@ -11,12 +11,14 @@ Built for **social impact**, this project empowers rural citizens by bridging th
 - 🎙️ **Voice Input & Output** in Telugu, Hindi, and English
 - 🗣️ **Natural Language Understanding** for governance-related queries
 - 📚 **Knowledge Base** covering:
-  - Crop insurance (PMFBY)
-  - Ration card application
-  - Land record lookup
-  - Farmer subsidies
-  - Local panchayat contacts
-- 🔁 **Fallback Response** when info is unavailable
+🌾Crop Insurance
+📋Ration Card
+🏠Land Records
+👴Pension
+🆔Aadhaar Card
+🎓Scholarship
+💼Job Card
+
 - 📱 **Mobile-Friendly UI** with mic button and replay option
 
 ## Author
