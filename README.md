@@ -8,19 +8,21 @@ Built for **social impact**, this project empowers rural citizens by bridging th
 
 ## 🌟 Features
 
-- 🎙️ **Voice Input & Output** in Telugu, Hindi, and English
-- 🗣️ **Natural Language Understanding** for governance-related queries
-- 📚 **Knowledge Base** 
-🌾Crop Insurance
-📋Ration Card
-🏠Land Records
-👴Pension
-🆔Aadhaar Card
-🎓Scholarship
-💼Job Card
-
+- 🎙️ **Voice Input & Output** in Telugu, Hindi, and English  
+- 🗣️ **Natural Language Understanding** for governance-related queries  
+- 📚 **Knowledge Base** covering:
+  - 🌾 **Crop Insurance**
+  - 📋 **Ration Card**
+  - 🏠 **Land Records**
+  - 👴 **Pension**
+  - 🆔 **Aadhaar Card**
+  - 🎓 **Scholarship**
+  - 💼 **Job Card**
 - 📱 **Mobile-Friendly UI** with mic button and replay option
 
-## Author
+---
 
-ak dinesh https://github.com/akdinesh2003
+## 👤 Author
+
+**AK DINESH**  
+(https://github.com/akdinesh2003)
